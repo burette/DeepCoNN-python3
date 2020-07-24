@@ -64,3 +64,79 @@ python train.py
 
 
 Last Update Date: Jan 3, 2018
+
+-------------分割线-------------------
+
+感谢原repo，之前跑过，最近又跑了一遍，python3下问题记录
+
+-------------分割线-------------------
+## Environments
+- python 3.5
+- Tensorflow 1.13.1
+
+## 更改说明
+1.print()加括号问题
+
+2.itervalue()改为value()
+
+3.在train.py中，xrange()改为range()
+
+4.load_data和data_pro中has_key()问题，改为in
+
+5.load_data中报错""AttributeError: Can't pickle local object 'numerize.<locals>.<lambda>’"，在58行numberize()函数中的map改为list(map())
+
+6.data_pro.py和train.py中"AttributeError: _parse_flags：""，注释掉""# FLAGS._parse_flags()"即可
+
+7.data_pro中报错""UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 0: invalid start byte："，在data_pro中改为
+f1 = open(user_review,'rb')
+f2 = open(item_review,'rb')
+
+8.DeepCoNN中，有三处concat()函数，将tf.concat(3,pooled_outputs_u)改为tf.concat(pooled_outputs_u, 3),其余的也是一样
+
+9.train.py中加载预训练模型读取词向量：
+原来的
+
+                with open(FLAGS.word2vec, "rb") as f:
+                    header = f.readline()
+                    vocab_size, layer1_size = map(int, header.split())
+                    binary_len = np.dtype('float32').itemsize * layer1_size
+                    for line in xrange(vocab_size):
+                        word = []
+                        while True:
+                            ch = f.read(1)
+                            if ch == ' ':
+                                word = ''.join(word)
+                                break
+                            if ch != '\n':
+                                word.append(ch)
+                        idx = 0
+
+                        if word in vocabulary_user:
+                            u = u + 1
+                            idx = vocabulary_user[word]
+                            initW[idx] = np.fromstring(f.read(binary_len), dtype='float32')
+                        else:
+                            f.read(binary_len)
+
+改为
+
+                with open(FLAGS.word2vec, "rb") as f:
+                    header = f.readline()
+                    vocab_size, layer1_size = map(int, header.split())
+                    binary_len = np.dtype('float32').itemsize * layer1_size
+                    for line in tqdm(range(vocab_size)):
+                        word = b''
+                        while True:
+                            ch = f.read(1)
+                            if ch == b' ':
+                                break
+                            if ch != '\n':
+                                word += (ch)
+                        idx = 0
+
+                        if word in vocabulary_user:
+                            u = u + 1
+                            idx = vocabulary_user[word]
+                            initW[idx] = np.fromstring(f.read(binary_len), dtype='float32')
+                        else:
+                            f.read(binary_len)

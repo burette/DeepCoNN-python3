@@ -158,15 +158,14 @@ if __name__ == '__main__':
                     header = f.readline()
                     vocab_size, layer1_size = map(int, header.split())
                     binary_len = np.dtype('float32').itemsize * layer1_size
-                    for line in xrange(vocab_size):
-                        word = []
+                    for line in tqdm(range(vocab_size)):
+                        word = b''
                         while True:
                             ch = f.read(1)
-                            if ch == ' ':
-                                word = ''.join(word)
+                            if ch == b' ':
                                 break
                             if ch != '\n':
-                                word.append(ch)
+                                word += (ch)
                         idx = 0
 
                         if word in vocabulary_user:
@@ -185,19 +184,19 @@ if __name__ == '__main__':
                     header = f.readline()
                     vocab_size, layer1_size = map(int, header.split())
                     binary_len = np.dtype('float32').itemsize * layer1_size
-                    for line in xrange(vocab_size):
-                        word = []
+                    for line in tqdm(range(vocab_size)):
+                        word = b''
                         while True:
                             ch = f.read(1)
-                            if ch == ' ':
-                                word = ''.join(word)
+                            if ch == b' ':
                                 break
                             if ch != '\n':
-                                word.append(ch)
+                                word += (ch)
                         idx = 0
-                        if word in vocabulary_item:
-                            item = item + 1
-                            idx = vocabulary_item[word]
+
+                        if word in vocabulary_user:
+                            u = u + 1
+                            idx = vocabulary_user[word]
                             initW[idx] = np.fromstring(f.read(binary_len), dtype='float32')
                         else:
                             f.read(binary_len)
